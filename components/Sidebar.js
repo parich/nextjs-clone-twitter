@@ -26,7 +26,7 @@ export default function Sidebar() {
         ></Image>
       </div>
       {/*Menu*/}
-      <div className='mt-4 mb-2.5 xl:items-start'>
+      <div className="mt-4 mb-2.5 xl:items-start">
         <SidebarMenuItem text="Home" Icon={HomeIcon} active />
         <SidebarMenuItem text="Explore" Icon={HashtagIcon} />
         <SidebarMenuItem text="Notifications" Icon={BellIcon} />
