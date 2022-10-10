@@ -1,6 +1,14 @@
 import { FaceSmileIcon, PhotoIcon } from '@heroicons/react/24/solid';
 import React, { useRef, useState } from 'react';
 import { useSession, signOut } from 'next-auth/react';
+import { db } from '../firebase';
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from 'firebase/firestore';
 
 export default function Input() {
   const { data: session } = useSession();
@@ -12,11 +20,23 @@ export default function Input() {
 
   const sendPost = async () => {
     setLoading(true);
-    console.log(loading);
+    //console.log(loading);
+    const docRef = await addDoc(collection(db, 'posts'), {
+      id: session.user.uid,
+      text: input,
+      userImg: session.user.image,
+      timestamp: serverTimestamp(),
+      name: session.user.name,
+      username: session.user.username,
+    });
+
+    setInput('');
   };
 
   const addImageToPost = (e) => {
-    console.log(e.target.files);
+    //console.log(e.target.files);
+    const reader = new FileReader();
+    console.log(reader);
   };
 
   return (
