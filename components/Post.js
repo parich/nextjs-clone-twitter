@@ -7,6 +7,7 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/solid';
 import React from 'react';
+import Moment from 'react-moment';
 
 export default function Post({ post }) {
   return (
@@ -14,22 +15,24 @@ export default function Post({ post }) {
       {/* user image */}
       <img
         className="h-11 w-11 rounded-full mr-4"
-        src={post.userImg}
+        src={post.data().userImg}
         alt="user-img"
       />
       {/* right side */}
       <div className="">
-        
         {/* Header */}
         <div className="flex items-center justify-between">
           {/* post user info */}
           <div className="flex items-center space-x-1 whitespace-nowrap">
             <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
-              {post.name}
+              {post.data().name}
             </h4>
-            <span className="text-sm sm:text-[15px]">@{post.username} - </span>
+            <span className="text-sm sm:text-[15px]">
+              @{post.data().username} -{' '}
+            </span>
             <span className="text-sm sm:text-[15px] hover:underline">
               {post.timestamp}
+              <Moment fromNow>{post.data().timestamp.toDate()}</Moment>
             </span>
           </div>
 
@@ -39,11 +42,11 @@ export default function Post({ post }) {
 
         {/* post text */}
         <p className="text-gray-800 text-[15px sm:text-[16px] mb-2">
-          {post.text}
+          {post.data().text}
         </p>
 
         {/* post image */}
-        <img className="rounded-2xl mr-2" src={post.img} alt="" />
+        <img className="rounded-2xl mr-2" src={post.data().image} alt="" />
 
         {/* icons */}
         <div className="flex justify-between text-gray-500 p-2">
