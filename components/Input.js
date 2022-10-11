@@ -1,7 +1,7 @@
-import { FaceSmileIcon, PhotoIcon } from '@heroicons/react/24/solid';
+import { FaceSmileIcon, PhotoIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import React, { useRef, useState } from 'react';
 import { useSession, signOut } from 'next-auth/react';
-import { db } from '../firebase';
+import { db, storage } from '../firebase';
 import {
   addDoc,
   collection,
@@ -9,17 +9,22 @@ import {
   serverTimestamp,
   updateDoc,
 } from 'firebase/firestore';
+import { getDownloadURL, ref, uploadString } from 'firebase/storage';
+import { async } from '@firebase/util';
 
 export default function Input() {
   const { data: session } = useSession();
   //console.log(session);
 
   const [input, setInput] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
   const filePickerRef = useRef(null);
   const [loading, setLoading] = useState(false);
 
   const sendPost = async () => {
+    if (loading) return;
     setLoading(true);
+
     //console.log(loading);
     const docRef = await addDoc(collection(db, 'posts'), {
       id: session.user.uid,
@@ -30,13 +35,31 @@ export default function Input() {
       username: session.user.username,
     });
 
+    const imageRef = ref(storage, `posts/${docRef.id}/image`);
+    if (selectedFile) {
+      await uploadString(imageRef, selectedFile, 'data_url').then(async () => {
+        const downloadURL = await getDownloadURL(imageRef);
+        await updateDoc(doc(db, 'posts', docRef.id), {
+          image: downloadURL,
+        });
+      });
+    }
     setInput('');
+    setSelectedFile(null);
+    setLoading(false);
   };
 
   const addImageToPost = (e) => {
     //console.log(e.target.files);
     const reader = new FileReader();
-    console.log(reader);
+    //console.log(reader);
+    if (e.target.files[0]) {
+      reader.readAsDataURL(e.target.files[0]);
+    }
+    reader.onload = (readerEvent) => {
+      //console.log(readerEvent.target.result);
+      setSelectedFile(readerEvent.target.result);
+    };
   };
 
   return (
@@ -62,29 +85,46 @@ export default function Input() {
               />
             </div>
 
-            {/*Icon button*/}
-            <div className="flex items-center justify-between pt-2.5">
-              <div className="flex">
-                <div onClick={() => filePickerRef.current.click()}>
-                  <PhotoIcon className="h-10 w-10 hoverEffect p-2 text-sky-500 hover:bg-sky-100" />
-                  <input
-                    type="file"
-                    hidden
-                    ref={filePickerRef}
-                    onChange={addImageToPost}
-                  />
-                </div>
-                <FaceSmileIcon className="h-10 w-10 hoverEffect p-2 text-sky-500 hover:bg-sky-100" />
+            {selectedFile && (
+              <div className="relative">
+                <XMarkIcon
+                  onClick={() => setSelectedFile(null)}
+                  className="h-7 text-black absolute cursor-pointer shadow-sm shadow-white rounded-full"
+                />
+                <img
+                  src={selectedFile}
+                  className={`${loading && 'animate-pulse'}`}
+                />
               </div>
+            )}
 
-              <button
-                onClick={sendPost}
-                disabled={!input.trim()}
-                className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50"
-              >
-                Tweet
-              </button>
-            </div>
+            {!loading && (
+              <>
+                {/*Icon button*/}
+                <div className="flex items-center justify-between pt-2.5">
+                  <div className="flex">
+                    <div onClick={() => filePickerRef.current.click()}>
+                      <PhotoIcon className="h-10 w-10 hoverEffect p-2 text-sky-500 hover:bg-sky-100" />
+                      <input
+                        type="file"
+                        hidden
+                        ref={filePickerRef}
+                        onChange={addImageToPost}
+                      />
+                    </div>
+                    <FaceSmileIcon className="h-10 w-10 hoverEffect p-2 text-sky-500 hover:bg-sky-100" />
+                  </div>
+
+                  <button
+                    onClick={sendPost}
+                    disabled={!input.trim()}
+                    className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50"
+                  >
+                    Tweet
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
