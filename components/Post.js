@@ -32,7 +32,7 @@ export default function Post({ post }) {
             </span>
             <span className="text-sm sm:text-[15px] hover:underline">
               {post.timestamp}
-              <Moment fromNow>{post.data().timestamp.toDate()}</Moment>
+              <Moment fromNow>{post.data().timestamp?.toDate()}</Moment>
             </span>
           </div>
 

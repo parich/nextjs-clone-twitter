@@ -14,7 +14,7 @@ import { async } from '@firebase/util';
 
 export default function Input() {
   const { data: session } = useSession();
-  //console.log(session);
+  console.log(session);
 
   const [input, setInput] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
