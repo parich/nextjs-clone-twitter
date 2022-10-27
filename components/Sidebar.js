@@ -16,7 +16,7 @@ import { useSession, signIn, signOut } from 'next-auth/react';
 
 export default function Sidebar() {
   const { data: session } = useSession();
-  
+
   //console.log(session);
 
   return (
@@ -72,9 +72,9 @@ export default function Sidebar() {
       ) : (
         <button
           onClick={() => signIn()}
-          className="bg-blue-400 rounded-lg p-3 text-white hover:bg-blue-500"
+          className="bg-blue-400 text-white rounded-full w-56 h-12 font-bold shadow-md hover:brightness-95 text-lg hidden xl:inline"
         >
-          Sign in with Google
+          SignIn
         </button>
       )}
     </div>

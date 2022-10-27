@@ -7,8 +7,9 @@ import Post from './Post';
 
 export default function Feed() {
   const [posts, setPosts] = useState([]);
-  
-  console.log(posts);
+
+  //console.log(posts);
+
   useEffect(
     () =>
       onSnapshot(
