@@ -4,10 +4,17 @@ import Modal from 'react-modal';
 import { FaceSmileIcon, PhotoIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'react';
 import { db } from '../firebase';
-import { doc, onSnapshot } from 'firebase/firestore';
+import {
+  addDoc,
+  doc,
+  onSnapshot,
+  serverTimestamp,
+  collection,
+} from 'firebase/firestore';
 import Moment from 'react-moment';
 import { userState } from '../atom/userAtom';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
 
 export default function CommentModal() {
   const [open, setOpen] = useRecoilState(modalState);
@@ -16,6 +23,7 @@ export default function CommentModal() {
   const [currentUser] = useRecoilState(userState);
   const { data: session } = useSession();
   const [input, setInput] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
     onSnapshot(doc(db, 'posts', postId), (snapshot) => {
@@ -23,7 +31,20 @@ export default function CommentModal() {
     });
   }, [postId, db]);
 
-  function sendComment() {}
+  async function sendComment() {
+    await addDoc(collection(db, 'posts', postId, 'comments'), {
+      comment: input,
+      name: session.user.name,
+      username: session.user.username,
+      userImg: session.user.image,
+      timestamp: serverTimestamp(),
+    });
+
+    //close modal
+    setOpen(false);
+    setInput('');
+    router.push(`/posts/${postId}`);
+  }
 
   return (
     <div>
