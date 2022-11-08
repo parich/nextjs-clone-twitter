@@ -27,7 +27,7 @@ export default function CommentModal() {
 
   useEffect(() => {
     onSnapshot(doc(db, 'posts', postId), (snapshot) => {
-      setPost(snapshot);
+      setPost(snapshot.docs);
     });
   }, [postId, db]);
 
