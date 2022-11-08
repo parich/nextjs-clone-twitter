@@ -6,7 +6,6 @@ import {
   ShareIcon,
   TrashIcon,
 } from '@heroicons/react/24/solid';
-import React, { useEffect, useState } from 'react';
 import Moment from 'react-moment';
 import {
   collection,
@@ -14,17 +13,22 @@ import {
   doc,
   onSnapshot,
   setDoc,
-} from 'firebase/firestore';
-import { db } from '../firebase';
-import { signIn, useSession } from 'next-auth/react';
-import { useRecoilState } from 'recoil';
-import { modalState, } from '../atom/modalAtom';
+} from "firebase/firestore";
+import { db, storage } from "../firebase";
+import { signIn, useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { deleteObject, ref } from "firebase/storage";
+import { useRecoilState } from "recoil";
+import { modalState, postIdState } from "../atom/modalAtom";
+import { useRouter } from "next/router";
 
 export default function Comment({ comment, commentId, originalPostId }) {
   const { data: session } = useSession();
   const [likes, setLikes] = useState([]);
   const [hasLiked, setHasLiked] = useState(false);
   const [open, setOpen] = useRecoilState(modalState);
+  const [postId, setPostId] = useRecoilState(postIdState);
+  const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -99,7 +103,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
               {comment?.name}
             </h4>
             <span className="text-sm sm:text-[15px]">
-              @{comment?.username} -{" "}
+              @{comment?.username} -{' '}
             </span>
             <span className="text-sm sm:text-[15px] hover:underline">
               <Moment fromNow>{comment?.timestamp?.toDate()}</Moment>
@@ -152,9 +156,9 @@ export default function Comment({ comment, commentId, originalPostId }) {
             )}
             {likes.length > 0 && (
               <span
-                className={`${hasLiked && "text-red-600"} text-sm select-none`}
+                className={`${hasLiked && 'text-red-600'} text-sm select-none`}
               >
-                {" "}
+                {' '}
                 {likes.length}
               </span>
             )}
@@ -166,4 +170,4 @@ export default function Comment({ comment, commentId, originalPostId }) {
       </div>
     </div>
   );
-} 
+}
