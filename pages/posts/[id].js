@@ -15,6 +15,7 @@ import { db } from '../../firebase';
 import Post from '../../components/Post';
 import Comment from '../../components/Comment';
 import CommentModal from '../../components/CommetModel';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export default function PostPage({ newsResults, randomUsersResults }) {
   const router = useRouter();
@@ -55,8 +56,8 @@ export default function PostPage({ newsResults, randomUsersResults }) {
 
         <div className="xl:ml-[370px] border-l border-r border-gray-200  xl:min-w-[576px] sm:ml-[73px] flex-grow max-w-xl">
           <div className="flex items-center space-x-2  py-2 px-3 sticky top-0 z-50 bg-white border-b border-gray-200">
-            <div className="cursor-pointe"  onClick={() => router.push('/')}>
-              <ArrowLeftCircleIcon className="h-5 " />
+            <div className="" onClick={() => router.push('/')}>
+              <ArrowLeftCircleIcon className="h-10 hoverEffect w-10 p-2" />
             </div>
             <h2 className="text-lg sm:text-xl font-bold cursor-pointer">
               Tweet
@@ -67,14 +68,25 @@ export default function PostPage({ newsResults, randomUsersResults }) {
 
           {comments.length > 0 && (
             <div className="">
-              {comments.map((comment) => (
-                <Comment
-                  key={comment.id}
-                  commentId={comment.id}
-                  originalPostId={id}
-                  comment={comment.data()}
-                />
-              ))}
+              <AnimatePresence>
+                {comments.map((comment) => (
+                  <motion.div
+                    key={comment.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 1 }}
+                  >
+               
+                    <Comment
+                      key={comment.id}
+                      commentId={comment.id}
+                      originalPostId={id}
+                      comment={comment.data()}
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
           )}
         </div>
